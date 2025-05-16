@@ -3,6 +3,5 @@ package main
 import "fmt"
 
 func main() {
-    fmt.Println("Challenge placeholder")
+	fmt.Println("Challenge placeholder")
 }
-
