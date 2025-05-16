@@ -15,7 +15,7 @@ func xorEncrypt(plaintext, key []byte) []byte {
 	return cipher
 }
 
-func xorEncryptSingleByte(plaintext []byte, key byte) []byte {
+func xorSingleByte(plaintext []byte, key byte) []byte {
 	cipher := make([]byte, len(plaintext))
 
 	for i := 0; i < len(plaintext); i++ {
@@ -58,20 +58,11 @@ func normalize_distance(data []byte, keysize int) float64 {
 
 func FindKeySize(data []byte) int {
 
-	type keySizeScore struct {
-		keySize int
-		score   float64
-	}
-
-	var scores []keySizeScore
-
 	lowestDistance := float64(999999)
 	var bestKeySize int
 	for size := 2; size <= 40; size++ {
 
 		distance := normalize_distance(data, size)
-
-		scores = append(scores, keySizeScore{size, distance})
 
 		if distance < lowestDistance {
 			lowestDistance = distance
@@ -134,13 +125,13 @@ func transposeBlocks(data []byte, keysize int) [][]byte {
 	return chunks
 }
 
-func FindBestSingleXORKey(block []byte) byte {
+func FindBestSingleKey(block []byte) byte {
 	var xor []byte
 	var bestKey byte
 
 	bestScore := -1.0
 	for key := 0; key <= 255; key++ {
-		xor = xorEncryptSingleByte(block, byte(key))
+		xor = xorSingleByte(block, byte(key))
 		chunkScore := ScoreEnglishText(xor)
 		if chunkScore > bestScore {
 			bestScore = chunkScore
@@ -173,7 +164,7 @@ func main() {
 
 	decrypteKey := make([]byte, bestKeySize)
 	for i, block := range blocks {
-		decrypteKey[i] = FindBestSingleXORKey(block)
+		decrypteKey[i] = FindBestSingleKey(block)
 	}
 
 	decryptedFile := xorEncrypt(decoded, decrypteKey)
